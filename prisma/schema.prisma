@@ -1,0 +1,65 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id            String   @id @default(cuid())
+  name          String
+  email         String   @unique
+  passwordHash  String
+  createdAt     DateTime @default(now())
+
+  ownedDocuments    Document[]
+  collaborations    DocumentCollaborator[]
+  versions          DocumentVersion[]
+}
+
+model Document {
+  id          String   @id @default(cuid())
+  title       String   @default("Untitled Document")
+  content     String   @default("")
+  serverClock Int      @default(0)
+  ownerId     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  owner         User                   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  collaborators DocumentCollaborator[]
+  versions      DocumentVersion[]
+}
+
+model DocumentCollaborator {
+  id         String   @id @default(cuid())
+  documentId String
+  userId     String
+  role       Role     @default(VIEWER)
+  addedAt    DateTime @default(now())
+
+  document Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([documentId, userId])
+}
+
+model DocumentVersion {
+  id          String   @id @default(cuid())
+  documentId  String
+  content     String
+  label       String?
+  serverClock Int
+  createdById String
+  createdAt   DateTime @default(now())
+
+  document  Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
+  createdBy User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
+}
+
+enum Role {
+  OWNER
+  EDITOR
+  VIEWER
+}

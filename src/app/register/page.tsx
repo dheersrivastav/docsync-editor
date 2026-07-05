@@ -3,10 +3,8 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -20,34 +18,41 @@ export default function RegisterPage() {
     e.preventDefault();
     setError("");
     setLoading(true);
-
     const res = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name, email, password }),
     });
-
     const data = await res.json();
     setLoading(false);
-
     if (!res.ok) {
       setError(data.error || "Something went wrong");
     } else {
-      router.push("/login?registered=true");
+      router.push("/login");
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold">Create an account</CardTitle>
-          <CardDescription>Start collaborating on documents today</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
+    <div className="min-h-screen bg-[#FAFAFB] flex items-center justify-center px-4">
+      <div className="w-full max-w-md">
+
+        <div className="text-center mb-8">
+          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[#6D28D9] mb-4">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <polyline points="14 2 14 8 20 8" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              <line x1="16" y1="13" x2="8" y2="13" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+              <line x1="16" y1="17" x2="8" y2="17" stroke="white" strokeWidth="2" strokeLinecap="round"/>
+            </svg>
+          </div>
+          <h1 className="text-2xl font-semibold text-[#111827] tracking-tight">DocSync</h1>
+          <p className="text-sm text-[#6B7280] mt-1.5">Create your free account</p>
+        </div>
+
+        <div className="bg-white border border-[#E5E7EB] rounded-2xl p-8 shadow-sm">
+          <form onSubmit={handleSubmit} className="space-y-5">
+            <div className="space-y-1.5">
+              <Label htmlFor="name" className="text-sm font-medium text-[#111827]">Full name</Label>
               <Input
                 id="name"
                 type="text"
@@ -56,10 +61,12 @@ export default function RegisterPage() {
                 onChange={(e) => setName(e.target.value)}
                 required
                 autoComplete="name"
+                className="h-11 text-sm border-[#E5E7EB] focus-visible:ring-[#6D28D9] focus-visible:border-[#6D28D9]"
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="email" className="text-sm font-medium text-[#111827]">Email</Label>
               <Input
                 id="email"
                 type="email"
@@ -68,39 +75,48 @@ export default function RegisterPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 autoComplete="email"
+                className="h-11 text-sm border-[#E5E7EB] focus-visible:ring-[#6D28D9] focus-visible:border-[#6D28D9]"
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="password" className="text-sm font-medium text-[#111827]">Password</Label>
               <Input
                 id="password"
                 type="password"
-                placeholder="••••••••"
+                placeholder="Min. 6 characters"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 autoComplete="new-password"
                 minLength={6}
+                className="h-11 text-sm border-[#E5E7EB] focus-visible:ring-[#6D28D9] focus-visible:border-[#6D28D9]"
               />
             </div>
 
             {error && (
-              <p className="text-sm text-red-600">{error}</p>
+              <p className="text-sm text-[#EF4444] border-l-2 border-[#EF4444] pl-3 py-0.5">
+                {error}
+              </p>
             )}
 
-            <Button type="submit" className="w-full" disabled={loading}>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full h-11 bg-[#6D28D9] hover:bg-[#5b21b6] text-white text-sm font-medium rounded-lg transition-colors duration-150 disabled:opacity-60 disabled:cursor-not-allowed"
+            >
               {loading ? "Creating account..." : "Create account"}
-            </Button>
+            </button>
           </form>
 
-          <p className="mt-4 text-center text-sm text-gray-600">
+          <p className="mt-6 text-center text-sm text-[#6B7280]">
             Already have an account?{" "}
-            <Link href="/login" className="text-blue-600 hover:underline">
+            <Link href="/login" className="text-[#6D28D9] hover:text-[#5b21b6] font-medium transition-colors">
               Sign in
             </Link>
           </p>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 }

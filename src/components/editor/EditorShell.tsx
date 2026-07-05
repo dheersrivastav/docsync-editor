@@ -4,7 +4,6 @@ import { useState, useCallback } from "react";
 import Link from "next/link";
 import { ArrowLeft, Users, History } from "lucide-react";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
 import { TiptapEditor } from "@/components/editor/TiptapEditor";
 import { CollaboratorPanel } from "@/components/editor/CollaboratorPanel";
 import { SyncStatusBadge } from "@/components/editor/SyncStatusBadge";
@@ -15,6 +14,8 @@ import { useDocument } from "@/hooks/useDocument";
 import { useSync } from "@/hooks/useSync";
 import { useCollaboration } from "@/hooks/useCollaboration";
 import type { UserRole } from "@/types";
+
+type Panel = "collaborators" | "versions" | null;
 
 interface Props {
   document: {
@@ -30,21 +31,32 @@ interface Props {
   currentUserName: string;
 }
 
-type Panel = "collaborators" | "versions" | null;
+function HeaderButton({
+  onClick,
+  children,
+  label,
+}: {
+  onClick: () => void;
+  children: React.ReactNode;
+  label: string;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      aria-label={label}
+      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#374151] border border-[#E5E7EB] rounded-lg hover:border-[#6D28D9] hover:text-[#6D28D9] transition-colors duration-150 bg-white"
+    >
+      {children}
+    </button>
+  );
+}
 
 export function EditorShell({ document, currentUserId, currentUserName }: Props) {
   const [title, setTitle] = useState(document.title);
   const [panel, setPanel] = useState<Panel>(null);
-
   const canEdit = document.role === "OWNER" || document.role === "EDITOR";
 
-  const {
-    content,
-    syncStatus,
-    setSyncStatus,
-    handleContentChange,
-    applyServerUpdate,
-  } = useDocument({
+  const { content, syncStatus, setSyncStatus, handleContentChange, applyServerUpdate } = useDocument({
     id: document.id,
     title: document.title,
     content: document.content,
@@ -69,8 +81,8 @@ export function EditorShell({ document, currentUserId, currentUserName }: Props)
       applyServerUpdate(mergedContent, newClock);
       broadcastUpdate(mergedContent, newClock);
       toast.warning("Conflict resolved", {
-        description: "Your offline changes overlapped with another user's edits. The document was auto-merged.",
-        duration: 6000,
+        description: "Your offline changes were auto-merged with server edits.",
+        duration: 5000,
       });
     },
   });
@@ -82,7 +94,7 @@ export function EditorShell({ document, currentUserId, currentUserName }: Props)
 
   async function saveTitle(newTitle: string) {
     const trimmed = newTitle.trim();
-    if (!trimmed || trimmed === title) return;
+    if (!trimmed || trimmed === document.title) return;
     await fetch(`/api/documents/${document.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -97,15 +109,18 @@ export function EditorShell({ document, currentUserId, currentUserName }: Props)
 
   return (
     <div className="h-screen flex flex-col bg-white">
-      <header className="border-b border-gray-200 px-4 h-14 flex items-center justify-between shrink-0">
+      {/* Header */}
+      <header className="h-14 border-b border-[#E5E7EB] px-6 flex items-center justify-between shrink-0 bg-white">
         <div className="flex items-center gap-3 min-w-0 flex-1">
           <Link
             href="/dashboard"
-            className="text-gray-500 hover:text-gray-900 transition-colors shrink-0"
+            className="p-1.5 rounded-md text-[#9CA3AF] hover:text-[#111827] hover:bg-[#F3F4F6] transition-colors duration-150 shrink-0"
             aria-label="Back to dashboard"
           >
-            <ArrowLeft className="h-5 w-5" />
+            <ArrowLeft className="h-4 w-4" />
           </Link>
+
+          <div className="w-px h-5 bg-[#E5E7EB] shrink-0" />
 
           {canEdit ? (
             <input
@@ -114,35 +129,25 @@ export function EditorShell({ document, currentUserId, currentUserName }: Props)
               onChange={(e) => setTitle(e.target.value)}
               onBlur={(e) => saveTitle(e.target.value)}
               onKeyDown={(e) => { if (e.key === "Enter") e.currentTarget.blur(); }}
-              className="text-lg font-semibold text-gray-900 bg-transparent border-none outline-none truncate w-full max-w-sm"
+              className="text-base font-semibold text-[#111827] bg-transparent outline-none border-none truncate w-full max-w-md focus:text-[#6D28D9] transition-colors"
               aria-label="Document title"
             />
           ) : (
-            <h1 className="text-lg font-semibold text-gray-900 truncate">{title}</h1>
+            <h1 className="text-base font-semibold text-[#111827] truncate">{title}</h1>
           )}
         </div>
 
-        <div className="flex items-center gap-2 ml-4 shrink-0">
+        <div className="flex items-center gap-2.5 ml-4 shrink-0">
           <PresenceAvatars users={onlineUsers} typingUser={typingUser} />
           <SyncStatusBadge status={syncStatus} />
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setPanel(panel === "versions" ? null : "versions")}
-            aria-label="Version history"
-          >
-            <History className="h-4 w-4 mr-1.5" />
-            <span className="hidden sm:inline">History</span>
-          </Button>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => setPanel(panel === "collaborators" ? null : "collaborators")}
-            aria-label="Share document"
-          >
-            <Users className="h-4 w-4 mr-1.5" />
-            <span className="hidden sm:inline">Share</span>
-          </Button>
+          <HeaderButton onClick={() => setPanel(panel === "versions" ? null : "versions")} label="Version history">
+            <History className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline text-sm">History</span>
+          </HeaderButton>
+          <HeaderButton onClick={() => setPanel(panel === "collaborators" ? null : "collaborators")} label="Share document">
+            <Users className="h-3.5 w-3.5" />
+            <span className="hidden sm:inline text-sm">Share</span>
+          </HeaderButton>
         </div>
       </header>
 
@@ -150,18 +155,11 @@ export function EditorShell({ document, currentUserId, currentUserName }: Props)
         <AIToolbar
           content={content}
           onApply={handleChange}
-          onTitleChange={(t) => {
-            setTitle(t);
-            saveTitle(t);
-          }}
+          onTitleChange={(t) => { setTitle(t); saveTitle(t); }}
         />
       )}
 
-      <TiptapEditor
-        content={content}
-        editable={canEdit}
-        onChange={handleChange}
-      />
+      <TiptapEditor content={content} editable={canEdit} onChange={handleChange} />
 
       {panel === "collaborators" && (
         <CollaboratorPanel
@@ -170,7 +168,6 @@ export function EditorShell({ document, currentUserId, currentUserName }: Props)
           onClose={() => setPanel(null)}
         />
       )}
-
       {panel === "versions" && (
         <VersionPanel
           documentId={document.id}

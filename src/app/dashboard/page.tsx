@@ -3,11 +3,8 @@ import { redirect } from "next/navigation";
 import { prisma } from "@/lib/prisma";
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 import { NewDocumentButton } from "@/components/dashboard/NewDocumentButton";
 import { DeleteDocumentButton } from "@/components/dashboard/DeleteDocumentButton";
-import { FileText } from "lucide-react";
 
 async function getDocuments(userId: string) {
   const [owned, collaborated] = await Promise.all([
@@ -28,22 +25,20 @@ async function getDocuments(userId: string) {
     }),
   ]);
 
-  const docs = [
-    ...owned.map((d) => ({ ...d, role: "OWNER" as const, updatedAt: d.updatedAt, ownerName: d.owner.name })),
+  return [
+    ...owned.map((d) => ({ ...d, role: "OWNER" as const, ownerName: d.owner.name })),
     ...collaborated.map((c) => ({
       ...c.document,
       role: c.role as "EDITOR" | "VIEWER",
       ownerName: c.document.owner.name,
     })),
-  ];
-
-  return docs.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
+  ].sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
 }
 
-const roleBadgeStyle: Record<string, string> = {
-  OWNER: "bg-blue-100 text-blue-700",
-  EDITOR: "bg-green-100 text-green-700",
-  VIEWER: "bg-gray-100 text-gray-600",
+const roleBadge: Record<string, string> = {
+  OWNER:  "text-[#6D28D9] bg-[#F5F3FF] border border-[#DDD6FE]",
+  EDITOR: "text-[#22C55E] bg-[#F0FDF4] border border-[#BBF7D0]",
+  VIEWER: "text-[#6B7280] bg-[#F9FAFB] border border-[#E5E7EB]",
 };
 
 export default async function DashboardPage() {
@@ -54,48 +49,60 @@ export default async function DashboardPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">My Documents</h1>
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-2xl font-semibold text-[#111827]">Documents</h1>
+          <p className="text-sm text-[#6B7280] mt-1">
+            {docs.length === 0 ? "No documents yet" : `${docs.length} document${docs.length !== 1 ? "s" : ""}`}
+          </p>
+        </div>
         <NewDocumentButton />
       </div>
 
       {docs.length === 0 ? (
-        <div className="flex flex-col items-center justify-center py-24 text-center text-gray-500">
-          <FileText className="h-12 w-12 mb-4 text-gray-300" />
-          <p className="text-lg font-medium">No documents yet</p>
-          <p className="text-sm mt-1">Create your first document to get started</p>
+        <div className="border border-dashed border-[#E5E7EB] rounded-2xl flex flex-col items-center justify-center py-20 text-center bg-white">
+          <div className="w-10 h-10 rounded-xl bg-[#F5F3FF] flex items-center justify-center mb-4">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="#6D28D9" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+              <polyline points="14 2 14 8 20 8" stroke="#6D28D9" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+              <line x1="16" y1="13" x2="8" y2="13" stroke="#6D28D9" strokeWidth="1.8" strokeLinecap="round"/>
+              <line x1="16" y1="17" x2="8" y2="17" stroke="#6D28D9" strokeWidth="1.8" strokeLinecap="round"/>
+            </svg>
+          </div>
+          <p className="text-sm font-medium text-[#111827]">No documents yet</p>
+          <p className="text-xs text-[#6B7280] mt-1 mb-5">Create your first document to get started</p>
+          <NewDocumentButton />
         </div>
       ) : (
-        <div className="grid gap-3">
+        <div className="bg-white border border-[#E5E7EB] rounded-2xl overflow-hidden divide-y divide-[#F3F4F6]">
           {docs.map((doc) => (
-            <Card key={doc.id} className="hover:shadow-sm transition-shadow">
-              <CardContent className="flex items-center justify-between p-4">
-                <Link
-                  href={`/editor/${doc.id}`}
-                  className="flex items-center gap-3 flex-1 min-w-0"
-                >
-                  <FileText className="h-5 w-5 text-gray-400 shrink-0" />
-                  <div className="min-w-0">
-                    <p className="font-medium text-gray-900 truncate">{doc.title}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      by {doc.ownerName} ·{" "}
-                      {formatDistanceToNow(new Date(doc.updatedAt), { addSuffix: true })}
-                    </p>
-                  </div>
-                </Link>
+            <div
+              key={doc.id}
+              className="group flex items-center gap-4 px-6 py-4 hover:bg-[#FAFAFB] transition-colors duration-150"
+            >
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="shrink-0 text-[#9CA3AF] group-hover:text-[#6D28D9] transition-colors duration-150">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                <polyline points="14 2 14 8 20 8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+                <line x1="16" y1="17" x2="8" y2="17" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+              </svg>
 
-                <div className="flex items-center gap-3 ml-4 shrink-0">
-                  <span
-                    className={`text-xs font-medium px-2 py-0.5 rounded-full ${roleBadgeStyle[doc.role]}`}
-                  >
-                    {doc.role}
-                  </span>
-                  {doc.role === "OWNER" && (
-                    <DeleteDocumentButton docId={doc.id} />
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+              <Link href={`/editor/${doc.id}`} className="flex-1 min-w-0">
+                <p className="text-base font-medium text-[#111827] truncate group-hover:text-[#6D28D9] transition-colors duration-150">
+                  {doc.title}
+                </p>
+                <p className="text-sm text-[#9CA3AF] mt-0.5">
+                  {doc.role === "OWNER" ? "You" : doc.ownerName} · edited {formatDistanceToNow(new Date(doc.updatedAt), { addSuffix: true })}
+                </p>
+              </Link>
+
+              <div className="flex items-center gap-2.5 shrink-0">
+                <span className={`text-sm font-medium px-3 py-1 rounded-full ${roleBadge[doc.role]}`}>
+                  {doc.role.charAt(0) + doc.role.slice(1).toLowerCase()}
+                </span>
+                {doc.role === "OWNER" && <DeleteDocumentButton docId={doc.id} />}
+              </div>
+            </div>
           ))}
         </div>
       )}

@@ -43,17 +43,21 @@ export async function POST(req: NextRequest) {
 
   const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-  const completion = await groq.chat.completions.create({
-    model: "llama3-8b-8192",
-    messages: [
-      { role: "system", content: prompts[action] },
-      { role: "user", content: plainText },
-    ],
-    temperature: 0.3,
-    max_tokens: 1024,
-  });
+  try {
+    const completion = await groq.chat.completions.create({
+      model: "llama-3.1-8b-instant",
+      messages: [
+        { role: "system", content: prompts[action] },
+        { role: "user", content: plainText },
+      ],
+      temperature: 0.3,
+      max_tokens: 1024,
+    });
 
-  const result = completion.choices[0]?.message?.content?.trim() ?? "";
-
-  return NextResponse.json({ result });
+    const result = completion.choices[0]?.message?.content?.trim() ?? "";
+    return NextResponse.json({ result });
+  } catch (err) {
+    console.error("[AI route error]", err);
+    return NextResponse.json({ error: "AI request failed" }, { status: 500 });
+  }
 }

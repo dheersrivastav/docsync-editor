@@ -4,7 +4,7 @@ import { useEditor, EditorContent } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Placeholder from "@tiptap/extension-placeholder";
 import CharacterCount from "@tiptap/extension-character-count";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Toolbar } from "./Toolbar";
 
 interface Props {
@@ -14,12 +14,12 @@ interface Props {
 }
 
 export function TiptapEditor({ content, editable, onChange }: Props) {
+  const lastExternalContent = useRef(content);
+
   const editor = useEditor({
     extensions: [
       StarterKit,
-      Placeholder.configure({
-        placeholder: "Start writing…",
-      }),
+      Placeholder.configure({ placeholder: "Start writing…" }),
       CharacterCount,
     ],
     content,
@@ -30,16 +30,18 @@ export function TiptapEditor({ content, editable, onChange }: Props) {
     },
   });
 
-  // Sync content when it changes externally (e.g. after conflict resolution)
+  // Only apply external content changes when the editor is NOT focused.
+  // This prevents cursor reset / text erase while the user is actively typing.
   useEffect(() => {
     if (!editor) return;
-    const current = editor.getHTML();
-    if (current !== content) {
+    if (content === lastExternalContent.current) return;
+    lastExternalContent.current = content;
+
+    if (!editor.isFocused) {
       editor.commands.setContent(content);
     }
   }, [content, editor]);
 
-  // Update editable flag if role changes
   useEffect(() => {
     if (editor && editor.isEditable !== editable) {
       editor.setEditable(editable);
@@ -54,15 +56,13 @@ export function TiptapEditor({ content, editable, onChange }: Props) {
   return (
     <div className="flex flex-col flex-1 min-h-0">
       {editable && <Toolbar editor={editor} />}
-
       <div className="flex-1 overflow-y-auto">
         <EditorContent
           editor={editor}
-          className="prose prose-gray max-w-none px-8 py-6 min-h-full focus:outline-none"
+          className="prose prose-gray max-w-none px-12 py-8 min-h-full focus:outline-none"
         />
       </div>
-
-      <div className="flex justify-end px-8 py-2 text-xs text-gray-400 border-t border-gray-100">
+      <div className="flex justify-end px-12 py-2 text-xs text-[#9CA3AF] border-t border-[#F3F4F6]">
         {words} words · {chars} characters
       </div>
     </div>

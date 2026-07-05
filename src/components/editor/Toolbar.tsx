@@ -10,109 +10,129 @@ interface Props {
   editor: Editor;
 }
 
-interface ToolbarButton {
-  label: string;
-  icon: React.ReactNode;
-  action: () => void;
+function ToolBtn({
+  onClick,
+  active,
+  disabled,
+  label,
+  children,
+}: {
+  onClick: () => void;
   active?: boolean;
+  disabled?: boolean;
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      title={label}
+      aria-label={label}
+      aria-pressed={active}
+      className={`p-1.5 rounded-md transition-colors duration-100 ${
+        active
+          ? "bg-[#6D28D9] text-white"
+          : "text-[#6B7280] hover:bg-[#F3F4F6] hover:text-[#111827]"
+      } disabled:opacity-30 disabled:cursor-not-allowed`}
+    >
+      {children}
+    </button>
+  );
+}
+
+function Divider() {
+  return <span className="w-px h-4 bg-[#E5E7EB] mx-1" aria-hidden="true" />;
 }
 
 export function Toolbar({ editor }: Props) {
-  const buttons: ToolbarButton[] = [
-    {
-      label: "Heading 2",
-      icon: <Heading2 className="h-4 w-4" />,
-      action: () => editor.chain().focus().toggleHeading({ level: 2 }).run(),
-      active: editor.isActive("heading", { level: 2 }),
-    },
-    {
-      label: "Heading 3",
-      icon: <Heading3 className="h-4 w-4" />,
-      action: () => editor.chain().focus().toggleHeading({ level: 3 }).run(),
-      active: editor.isActive("heading", { level: 3 }),
-    },
-    {
-      label: "Bold",
-      icon: <Bold className="h-4 w-4" />,
-      action: () => editor.chain().focus().toggleBold().run(),
-      active: editor.isActive("bold"),
-    },
-    {
-      label: "Italic",
-      icon: <Italic className="h-4 w-4" />,
-      action: () => editor.chain().focus().toggleItalic().run(),
-      active: editor.isActive("italic"),
-    },
-    {
-      label: "Strikethrough",
-      icon: <Strikethrough className="h-4 w-4" />,
-      action: () => editor.chain().focus().toggleStrike().run(),
-      active: editor.isActive("strike"),
-    },
-    {
-      label: "Bullet list",
-      icon: <List className="h-4 w-4" />,
-      action: () => editor.chain().focus().toggleBulletList().run(),
-      active: editor.isActive("bulletList"),
-    },
-    {
-      label: "Numbered list",
-      icon: <ListOrdered className="h-4 w-4" />,
-      action: () => editor.chain().focus().toggleOrderedList().run(),
-      active: editor.isActive("orderedList"),
-    },
-    {
-      label: "Blockquote",
-      icon: <Quote className="h-4 w-4" />,
-      action: () => editor.chain().focus().toggleBlockquote().run(),
-      active: editor.isActive("blockquote"),
-    },
-    {
-      label: "Horizontal rule",
-      icon: <Minus className="h-4 w-4" />,
-      action: () => editor.chain().focus().setHorizontalRule().run(),
-    },
-  ];
-
   return (
-    <div className="flex items-center gap-0.5 px-4 py-2 border-b border-gray-100 flex-wrap">
-      {buttons.map((btn) => (
-        <button
-          key={btn.label}
-          onClick={btn.action}
-          title={btn.label}
-          aria-label={btn.label}
-          aria-pressed={btn.active}
-          className={`p-1.5 rounded transition-colors ${
-            btn.active
-              ? "bg-gray-900 text-white"
-              : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
-          }`}
-        >
-          {btn.icon}
-        </button>
-      ))}
+    <div className="flex items-center gap-0.5 px-4 py-2 border-b border-[#E5E7EB] flex-wrap bg-white">
+      <ToolBtn
+        label="Heading 2"
+        onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+        active={editor.isActive("heading", { level: 2 })}
+      >
+        <Heading2 className="h-4 w-4" />
+      </ToolBtn>
+      <ToolBtn
+        label="Heading 3"
+        onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+        active={editor.isActive("heading", { level: 3 })}
+      >
+        <Heading3 className="h-4 w-4" />
+      </ToolBtn>
 
-      <div className="w-px h-5 bg-gray-200 mx-1" aria-hidden="true" />
+      <Divider />
 
-      <button
+      <ToolBtn
+        label="Bold"
+        onClick={() => editor.chain().focus().toggleBold().run()}
+        active={editor.isActive("bold")}
+      >
+        <Bold className="h-4 w-4" />
+      </ToolBtn>
+      <ToolBtn
+        label="Italic"
+        onClick={() => editor.chain().focus().toggleItalic().run()}
+        active={editor.isActive("italic")}
+      >
+        <Italic className="h-4 w-4" />
+      </ToolBtn>
+      <ToolBtn
+        label="Strikethrough"
+        onClick={() => editor.chain().focus().toggleStrike().run()}
+        active={editor.isActive("strike")}
+      >
+        <Strikethrough className="h-4 w-4" />
+      </ToolBtn>
+
+      <Divider />
+
+      <ToolBtn
+        label="Bullet list"
+        onClick={() => editor.chain().focus().toggleBulletList().run()}
+        active={editor.isActive("bulletList")}
+      >
+        <List className="h-4 w-4" />
+      </ToolBtn>
+      <ToolBtn
+        label="Numbered list"
+        onClick={() => editor.chain().focus().toggleOrderedList().run()}
+        active={editor.isActive("orderedList")}
+      >
+        <ListOrdered className="h-4 w-4" />
+      </ToolBtn>
+      <ToolBtn
+        label="Blockquote"
+        onClick={() => editor.chain().focus().toggleBlockquote().run()}
+        active={editor.isActive("blockquote")}
+      >
+        <Quote className="h-4 w-4" />
+      </ToolBtn>
+      <ToolBtn
+        label="Horizontal rule"
+        onClick={() => editor.chain().focus().setHorizontalRule().run()}
+      >
+        <Minus className="h-4 w-4" />
+      </ToolBtn>
+
+      <Divider />
+
+      <ToolBtn
+        label="Undo"
         onClick={() => editor.chain().focus().undo().run()}
         disabled={!editor.can().undo()}
-        title="Undo"
-        aria-label="Undo"
-        className="p-1.5 rounded text-gray-600 hover:bg-gray-100 disabled:opacity-30 transition-colors"
       >
         <Undo className="h-4 w-4" />
-      </button>
-      <button
+      </ToolBtn>
+      <ToolBtn
+        label="Redo"
         onClick={() => editor.chain().focus().redo().run()}
         disabled={!editor.can().redo()}
-        title="Redo"
-        aria-label="Redo"
-        className="p-1.5 rounded text-gray-600 hover:bg-gray-100 disabled:opacity-30 transition-colors"
       >
         <Redo className="h-4 w-4" />
-      </button>
+      </ToolBtn>
     </div>
   );
 }

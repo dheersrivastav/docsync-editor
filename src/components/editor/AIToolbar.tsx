@@ -55,35 +55,38 @@ export function AIToolbar({ content, onApply, onTitleChange }: Props) {
   }
 
   return (
-    <div className="border-b border-[#E5E7EB] bg-[#F9FAFB]">
-      <div className="flex items-center gap-0.5 px-4 py-1.5">
-        <Sparkles className="h-3 w-3 text-[#6D28D9] mr-2 shrink-0" />
+    <div className="border-b border-gray-100 bg-gray-50">
+      <div className="flex items-center gap-1 px-5 py-2">
+        <div className="flex items-center gap-1.5 mr-3">
+          <Sparkles className="h-3.5 w-3.5 text-violet-500" />
+          <span className="text-xs font-medium text-violet-500 uppercase tracking-wide">AI</span>
+        </div>
         {actions.map(({ id, label }) => (
           <button
             key={id}
             onClick={() => run(id)}
             disabled={loading !== null}
-            className="flex items-center gap-1.5 px-3 py-1 text-xs font-medium text-[#6B7280] hover:text-[#6D28D9] hover:bg-[#F5F3FF] rounded-md transition-colors duration-150 disabled:opacity-50"
+            className="flex items-center gap-1.5 px-4 py-1.5 text-sm font-medium text-gray-600 hover:text-violet-700 hover:bg-violet-50 rounded-lg transition-colors duration-150 disabled:opacity-50"
           >
-            {loading === id && <Loader2 className="h-3 w-3 animate-spin" />}
+            {loading === id && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
             {label}
           </button>
         ))}
       </div>
 
       {summary && (
-        <div className="mx-4 mb-3 flex gap-3 p-3 bg-[#F5F3FF] border border-[#DDD6FE] rounded-xl">
-          <Sparkles className="h-3.5 w-3.5 text-[#6D28D9] mt-0.5 shrink-0" />
+        <div className="mx-5 mb-3 flex gap-3 p-4 bg-violet-50 border border-violet-200 rounded-xl">
+          <Sparkles className="h-4 w-4 text-violet-500 mt-0.5 shrink-0" />
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-semibold text-[#6D28D9] mb-1">Summary</p>
-            <p className="text-sm text-[#374151] leading-relaxed">{summary}</p>
+            <p className="text-xs font-semibold text-violet-600 mb-1.5 uppercase tracking-wide">Summary</p>
+            <p className="text-sm text-gray-700 leading-relaxed">{summary}</p>
           </div>
           <button
             onClick={() => setSummary(null)}
-            className="text-[#9CA3AF] hover:text-[#374151] shrink-0 transition-colors"
+            className="text-gray-400 hover:text-gray-600 shrink-0 transition-colors mt-0.5"
             aria-label="Dismiss"
           >
-            <X className="h-3.5 w-3.5" />
+            <X className="h-4 w-4" />
           </button>
         </div>
       )}

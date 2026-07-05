@@ -5,31 +5,31 @@ import type { SyncStatus } from "@/hooks/useDocument";
 
 const config: Record<SyncStatus, { icon: React.ReactNode; label: string; className: string }> = {
   synced: {
-    icon: <Cloud className="h-3 w-3" />,
+    icon: <Cloud className="h-3.5 w-3.5" />,
     label: "Saved",
-    className: "text-[#22C55E] bg-[#F0FDF4] border-[#BBF7D0]",
+    className: "text-emerald-600 bg-emerald-50 border-emerald-200",
   },
   pending: {
-    icon: <Loader2 className="h-3 w-3 animate-spin" />,
+    icon: <Loader2 className="h-3.5 w-3.5 animate-spin" />,
     label: "Saving",
-    className: "text-[#6D28D9] bg-[#F5F3FF] border-[#DDD6FE]",
+    className: "text-violet-600 bg-violet-50 border-violet-200",
   },
   offline: {
-    icon: <CloudOff className="h-3 w-3" />,
+    icon: <CloudOff className="h-3.5 w-3.5" />,
     label: "Offline",
-    className: "text-[#6B7280] bg-[#F9FAFB] border-[#E5E7EB]",
+    className: "text-amber-600 bg-amber-50 border-amber-200",
   },
   conflict: {
-    icon: <AlertTriangle className="h-3 w-3" />,
+    icon: <AlertTriangle className="h-3.5 w-3.5" />,
     label: "Conflict",
-    className: "text-[#EF4444] bg-[#FEF2F2] border-[#FECACA]",
+    className: "text-red-600 bg-red-50 border-red-200",
   },
 };
 
 export function SyncStatusBadge({ status }: { status: SyncStatus }) {
   const { icon, label, className } = config[status];
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium rounded-full border ${className}`}>
+    <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium rounded-lg border ${className}`}>
       {icon}
       <span className="hidden sm:inline">{label}</span>
     </span>

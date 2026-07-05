@@ -132,32 +132,38 @@
 /* Tiptap editor styles */
 .tiptap.ProseMirror {
   outline: none;
-  min-height: calc(100vh - 180px);
+  min-height: calc(100vh - 320px);
   font-size: 1rem;
-  line-height: 1.75;
+  line-height: 1.8;
+  color: #1f2937;
 }
 
 .tiptap.ProseMirror p.is-editor-empty:first-child::before {
   content: attr(data-placeholder);
-  color: #9ca3af;
+  color: #d1d5db;
   pointer-events: none;
   float: left;
   height: 0;
+  font-style: italic;
 }
 
-.prose h2 { @apply text-2xl font-semibold mt-10 mb-4 text-[#111827]; }
-.prose h3 { @apply text-xl font-semibold mt-8 mb-3 text-[#111827]; }
-.prose p  { @apply my-4 leading-8 text-[#374151] text-base; }
-.prose strong { @apply font-semibold text-[#111827]; }
-.prose em { @apply italic; }
-.prose s  { @apply line-through; }
-.prose ul { @apply list-disc pl-6 my-4 space-y-2; }
-.prose ol { @apply list-decimal pl-6 my-4 space-y-2; }
-.prose li { @apply text-[#374151]; }
+.prose h2 { @apply text-2xl font-bold mt-10 mb-4 text-gray-900 tracking-tight; }
+.prose h3 { @apply text-xl font-semibold mt-8 mb-3 text-gray-900; }
+.prose p  { @apply my-4 leading-8 text-gray-700 text-base; }
+.prose strong { @apply font-semibold text-gray-900; }
+.prose em { @apply italic text-gray-700; }
+.prose s  { @apply line-through text-gray-400; }
+.prose ul { @apply list-disc pl-6 my-4 space-y-2 text-gray-700; }
+.prose ol { @apply list-decimal pl-6 my-4 space-y-2 text-gray-700; }
+.prose li { @apply leading-7; }
 .prose blockquote {
-  @apply border-l-4 border-[#6D28D9] pl-5 italic text-[#6B7280] my-6;
+  @apply border-l-4 border-violet-300 pl-5 italic text-gray-500 my-6 bg-violet-50 py-3 rounded-r-lg;
 }
-.prose hr { @apply my-8 border-[#E5E7EB]; }
-.prose code { @apply bg-[#F5F3FF] text-[#6D28D9] px-1.5 py-0.5 rounded text-sm font-mono; }
-.prose pre  { @apply bg-[#1e1b2e] text-gray-100 p-5 rounded-xl overflow-x-auto my-6; }
-.prose pre code { @apply bg-transparent p-0 text-sm text-gray-100; }
+.prose hr { @apply my-8 border-gray-200; }
+.prose code {
+  @apply bg-gray-100 text-violet-700 px-1.5 py-0.5 rounded-md text-sm font-mono;
+}
+.prose pre {
+  @apply bg-gray-900 text-gray-100 p-5 rounded-xl overflow-x-auto my-6 text-sm;
+}
+.prose pre code { @apply bg-transparent p-0 text-gray-100; }

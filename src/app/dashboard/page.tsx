@@ -36,9 +36,9 @@ async function getDocuments(userId: string) {
 }
 
 const roleBadge: Record<string, string> = {
-  OWNER:  "text-[#6D28D9] bg-[#F5F3FF] border border-[#DDD6FE]",
-  EDITOR: "text-[#22C55E] bg-[#F0FDF4] border border-[#BBF7D0]",
-  VIEWER: "text-[#6B7280] bg-[#F9FAFB] border border-[#E5E7EB]",
+  OWNER:  "text-violet-600 bg-violet-50 border border-violet-200",
+  EDITOR: "text-emerald-600 bg-emerald-50 border border-emerald-200",
+  VIEWER: "text-gray-500 bg-gray-50 border border-gray-200",
 };
 
 export default async function DashboardPage() {
@@ -51,8 +51,8 @@ export default async function DashboardPage() {
     <div>
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-semibold text-[#111827]">Documents</h1>
-          <p className="text-sm text-[#6B7280] mt-1">
+          <h1 className="text-2xl font-semibold text-gray-900 tracking-tight">Documents</h1>
+          <p className="text-sm text-gray-500 mt-1">
             {docs.length === 0 ? "No documents yet" : `${docs.length} document${docs.length !== 1 ? "s" : ""}`}
           </p>
         </div>
@@ -60,27 +60,30 @@ export default async function DashboardPage() {
       </div>
 
       {docs.length === 0 ? (
-        <div className="border border-dashed border-[#E5E7EB] rounded-2xl flex flex-col items-center justify-center py-20 text-center bg-white">
-          <div className="w-10 h-10 rounded-xl bg-[#F5F3FF] flex items-center justify-center mb-4">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
-              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="#6D28D9" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-              <polyline points="14 2 14 8 20 8" stroke="#6D28D9" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
-              <line x1="16" y1="13" x2="8" y2="13" stroke="#6D28D9" strokeWidth="1.8" strokeLinecap="round"/>
-              <line x1="16" y1="17" x2="8" y2="17" stroke="#6D28D9" strokeWidth="1.8" strokeLinecap="round"/>
+        <div className="border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center py-24 text-center bg-white">
+          <div className="w-12 h-12 rounded-2xl bg-violet-50 flex items-center justify-center mb-4">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="#7C3AED" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+              <polyline points="14 2 14 8 20 8" stroke="#7C3AED" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+              <line x1="16" y1="13" x2="8" y2="13" stroke="#7C3AED" strokeWidth="1.8" strokeLinecap="round"/>
+              <line x1="16" y1="17" x2="8" y2="17" stroke="#7C3AED" strokeWidth="1.8" strokeLinecap="round"/>
             </svg>
           </div>
-          <p className="text-sm font-medium text-[#111827]">No documents yet</p>
-          <p className="text-xs text-[#6B7280] mt-1 mb-5">Create your first document to get started</p>
+          <p className="text-base font-medium text-gray-900">No documents yet</p>
+          <p className="text-sm text-gray-400 mt-1 mb-6">Create your first document to get started</p>
           <NewDocumentButton />
         </div>
       ) : (
-        <div className="bg-white border border-[#E5E7EB] rounded-2xl overflow-hidden divide-y divide-[#F3F4F6]">
+        <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden divide-y divide-gray-100 shadow-sm">
           {docs.map((doc) => (
             <div
               key={doc.id}
-              className="group flex items-center gap-4 px-6 py-4 hover:bg-[#FAFAFB] transition-colors duration-150"
+              className="group flex items-center gap-4 px-6 py-4 hover:bg-gray-50 transition-colors duration-150 cursor-pointer"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" className="shrink-0 text-[#9CA3AF] group-hover:text-[#6D28D9] transition-colors duration-150">
+              <svg
+                width="18" height="18" viewBox="0 0 24 24" fill="none"
+                className="shrink-0 text-gray-300 group-hover:text-violet-400 transition-colors duration-150"
+              >
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
                 <polyline points="14 2 14 8 20 8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
                 <line x1="16" y1="13" x2="8" y2="13" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
@@ -88,16 +91,16 @@ export default async function DashboardPage() {
               </svg>
 
               <Link href={`/editor/${doc.id}`} className="flex-1 min-w-0">
-                <p className="text-base font-medium text-[#111827] truncate group-hover:text-[#6D28D9] transition-colors duration-150">
+                <p className="text-[15px] font-medium text-gray-900 truncate group-hover:text-violet-700 transition-colors duration-150">
                   {doc.title}
                 </p>
-                <p className="text-sm text-[#9CA3AF] mt-0.5">
+                <p className="text-sm text-gray-400 mt-0.5">
                   {doc.role === "OWNER" ? "You" : doc.ownerName} · edited {formatDistanceToNow(new Date(doc.updatedAt), { addSuffix: true })}
                 </p>
               </Link>
 
-              <div className="flex items-center gap-2.5 shrink-0">
-                <span className={`text-sm font-medium px-3 py-1 rounded-full ${roleBadge[doc.role]}`}>
+              <div className="flex items-center gap-3 shrink-0">
+                <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${roleBadge[doc.role]}`}>
                   {doc.role.charAt(0) + doc.role.slice(1).toLowerCase()}
                 </span>
                 {doc.role === "OWNER" && <DeleteDocumentButton docId={doc.id} />}

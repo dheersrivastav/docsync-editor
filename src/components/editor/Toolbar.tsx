@@ -31,10 +31,10 @@ function ToolBtn({
       title={label}
       aria-label={label}
       aria-pressed={active}
-      className={`p-2 rounded-md transition-colors duration-100 ${
+      className={`p-2 rounded-lg transition-colors duration-100 ${
         active
-          ? "bg-[#6D28D9] text-white"
-          : "text-[#6B7280] hover:bg-white hover:text-[#111827] hover:shadow-sm"
+          ? "bg-violet-600 text-white shadow-sm"
+          : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"
       } disabled:opacity-30 disabled:cursor-not-allowed`}
     >
       {children}
@@ -43,32 +43,32 @@ function ToolBtn({
 }
 
 function Divider() {
-  return <span className="w-px h-4 bg-[#E5E7EB] mx-1 shrink-0" aria-hidden="true" />;
+  return <span className="w-px h-5 bg-gray-200 mx-1.5 shrink-0" aria-hidden="true" />;
 }
 
 export function Toolbar({ editor }: Props) {
   function cmd(fn: () => void) {
     return (e: React.MouseEvent) => {
-      e.preventDefault(); // keeps editor focused
+      e.preventDefault();
       fn();
     };
   }
 
   return (
-    <div className="flex items-center gap-0.5 px-4 py-2 border-b border-[#E5E7EB] flex-wrap bg-[#F9FAFB]">
+    <div className="flex items-center gap-0.5 px-5 py-2 border-b border-gray-100 flex-wrap bg-white">
       <ToolBtn
         label="Heading 2"
         onMouseDown={cmd(() => editor.chain().focus().toggleHeading({ level: 2 }).run())}
         active={editor.isActive("heading", { level: 2 })}
       >
-        <Heading2 className="h-4 w-4" />
+        <Heading2 className="h-4.5 w-4.5" />
       </ToolBtn>
       <ToolBtn
         label="Heading 3"
         onMouseDown={cmd(() => editor.chain().focus().toggleHeading({ level: 3 }).run())}
         active={editor.isActive("heading", { level: 3 })}
       >
-        <Heading3 className="h-4 w-4" />
+        <Heading3 className="h-4.5 w-4.5" />
       </ToolBtn>
 
       <Divider />

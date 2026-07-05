@@ -44,7 +44,7 @@ function HeaderButton({
     <button
       onClick={onClick}
       aria-label={label}
-      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#374151] border border-[#E5E7EB] rounded-lg hover:border-[#6D28D9] hover:text-[#6D28D9] transition-colors duration-150 bg-white"
+      className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:border-violet-300 hover:text-violet-700 hover:bg-violet-50 transition-colors duration-150 bg-white"
     >
       {children}
     </button>
@@ -141,16 +141,16 @@ export function EditorShell({ document, currentUserId, currentUserName }: Props)
           )}
         </div>
 
-        <div className="flex items-center gap-2.5 ml-4 shrink-0">
+        <div className="flex items-center gap-3 ml-4 shrink-0">
           <PresenceAvatars users={onlineUsers} typingUser={typingUser} />
           <SyncStatusBadge status={syncStatus} />
           <HeaderButton onClick={() => setPanel(panel === "versions" ? null : "versions")} label="Version history">
-            <History className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline text-sm">History</span>
+            <History className="h-4 w-4" />
+            <span className="hidden sm:inline">History</span>
           </HeaderButton>
           <HeaderButton onClick={() => setPanel(panel === "collaborators" ? null : "collaborators")} label="Share document">
-            <Users className="h-3.5 w-3.5" />
-            <span className="hidden sm:inline text-sm">Share</span>
+            <Users className="h-4 w-4" />
+            <span className="hidden sm:inline">Share</span>
           </HeaderButton>
         </div>
       </header>

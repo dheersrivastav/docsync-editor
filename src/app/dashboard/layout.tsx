@@ -87,7 +87,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
               <span className="font-medium">Dheer Srivastava</span>
             </a>
             <a
-              href="https://www.linkedin.com/in/dheer-srivastava"
+              href="https://linkedin.com/in/dheer-srivastav"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 text-gray-500 hover:text-blue-600 transition-colors duration-150"

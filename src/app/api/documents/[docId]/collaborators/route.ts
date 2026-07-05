@@ -27,8 +27,14 @@ export async function GET(_req: NextRequest, { params }: Params) {
     },
   });
 
+  type CollabRow = {
+    id: string;
+    role: string;
+    user: { id: string; name: string; email: string };
+  };
+
   return NextResponse.json(
-    collaborators.map((c) => ({
+    (collaborators as CollabRow[]).map((c) => ({
       id: c.id,
       userId: c.user.id,
       name: c.user.name,

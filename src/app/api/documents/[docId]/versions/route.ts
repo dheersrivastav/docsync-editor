@@ -29,7 +29,13 @@ export async function GET(_req: NextRequest, { params }: Params) {
   });
 
   return NextResponse.json(
-    versions.map((v) => ({
+    versions.map((v: {
+      id: string;
+      label: string | null;
+      serverClock: number;
+      createdAt: Date;
+      createdBy: { name: string };
+    }) => ({
       id: v.id,
       label: v.label,
       serverClock: v.serverClock,

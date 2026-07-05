@@ -39,7 +39,12 @@ export async function GET() {
     }),
   ]);
 
-  const ownedDocs = owned.map((d) => ({
+  const ownedDocs = owned.map((d: {
+    id: string;
+    title: string;
+    updatedAt: Date;
+    owner: { name: string };
+  }) => ({
     id: d.id,
     title: d.title,
     updatedAt: d.updatedAt.toISOString(),
@@ -47,7 +52,10 @@ export async function GET() {
     ownerName: d.owner.name,
   }));
 
-  const collabDocs = collaborated.map((c) => ({
+  const collabDocs = collaborated.map((c: {
+    role: string;
+    document: { id: string; title: string; updatedAt: Date; owner: { name: string } };
+  }) => ({
     id: c.document.id,
     title: c.document.title,
     updatedAt: c.document.updatedAt.toISOString(),

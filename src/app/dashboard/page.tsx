@@ -26,8 +26,12 @@ async function getDocuments(userId: string) {
   ]);
 
   return [
-    ...owned.map((d) => ({ ...d, role: "OWNER" as const, ownerName: d.owner.name })),
-    ...collaborated.map((c) => ({
+    ...owned.map((d: { id: string; title: string; updatedAt: Date; owner: { name: string } }) => ({
+      ...d,
+      role: "OWNER" as const,
+      ownerName: d.owner.name,
+    })),
+    ...collaborated.map((c: { role: string; document: { id: string; title: string; updatedAt: Date; owner: { name: string } } }) => ({
       ...c.document,
       role: c.role as "EDITOR" | "VIEWER",
       ownerName: c.document.owner.name,

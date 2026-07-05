@@ -77,6 +77,16 @@ export async function POST(req: NextRequest, { params }: Params) {
     select: { content: true, serverClock: true },
   });
 
+  // Notify other clients in the room via Socket.IO if server is available
+  const io = (globalThis as unknown as Record<string, unknown>).__io as import("socket.io").Server | undefined;
+  if (io) {
+    io.to(docId).emit("document-updated", {
+      content: updated.content,
+      serverClock: updated.serverClock,
+      updatedBy: session.user.id,
+    });
+  }
+
   return NextResponse.json({
     content: updated.content,
     serverClock: updated.serverClock,

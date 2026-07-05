@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import Link from "next/link";
 import { ArrowLeft, Users } from "lucide-react";
 import { toast } from "sonner";
@@ -8,8 +8,10 @@ import { Button } from "@/components/ui/button";
 import { TiptapEditor } from "@/components/editor/TiptapEditor";
 import { CollaboratorPanel } from "@/components/editor/CollaboratorPanel";
 import { SyncStatusBadge } from "@/components/editor/SyncStatusBadge";
+import { PresenceAvatars } from "@/components/editor/PresenceAvatars";
 import { useDocument } from "@/hooks/useDocument";
 import { useSync } from "@/hooks/useSync";
+import { useCollaboration } from "@/hooks/useCollaboration";
 import type { UserRole } from "@/types";
 
 interface Props {
@@ -46,21 +48,33 @@ export function EditorShell({ document, currentUserId, currentUserName }: Props)
     role: document.role,
   });
 
-  useSync({
+  const { broadcastUpdate, broadcastTyping, onlineUsers, typingUser } = useCollaboration({
+    docId: document.id,
+    currentUserId,
+    onRemoteUpdate: applyServerUpdate,
+  });
+
+  const { flush } = useSync({
     docId: document.id,
     setSyncStatus,
     onSynced(newContent, newClock) {
       applyServerUpdate(newContent, newClock);
+      broadcastUpdate(newContent, newClock);
     },
     onConflict(mergedContent, newClock) {
       applyServerUpdate(mergedContent, newClock);
+      broadcastUpdate(mergedContent, newClock);
       toast.warning("Conflict resolved", {
-        description:
-          "Your offline changes overlapped with edits from another user. The document has been auto-merged — server changes were kept where both sides edited the same section.",
+        description: "Your offline changes overlapped with another user's edits. The document was auto-merged — server edits were kept where both sides changed the same section.",
         duration: 6000,
       });
     },
   });
+
+  const handleChange = useCallback((html: string) => {
+    handleContentChange(html);
+    broadcastTyping();
+  }, [handleContentChange, broadcastTyping]);
 
   async function saveTitle(newTitle: string) {
     const trimmed = newTitle.trim();
@@ -74,7 +88,6 @@ export function EditorShell({ document, currentUserId, currentUserName }: Props)
 
   return (
     <div className="h-screen flex flex-col bg-white">
-      {/* Top bar */}
       <header className="border-b border-gray-200 px-4 h-14 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3 min-w-0 flex-1">
           <Link
@@ -91,9 +104,7 @@ export function EditorShell({ document, currentUserId, currentUserName }: Props)
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               onBlur={(e) => saveTitle(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") e.currentTarget.blur();
-              }}
+              onKeyDown={(e) => { if (e.key === "Enter") e.currentTarget.blur(); }}
               className="text-lg font-semibold text-gray-900 bg-transparent border-none outline-none truncate w-full max-w-sm"
               aria-label="Document title"
             />
@@ -103,6 +114,7 @@ export function EditorShell({ document, currentUserId, currentUserName }: Props)
         </div>
 
         <div className="flex items-center gap-3 ml-4 shrink-0">
+          <PresenceAvatars users={onlineUsers} typingUser={typingUser} />
           <SyncStatusBadge status={syncStatus} />
           <Button
             variant="ghost"
@@ -116,14 +128,12 @@ export function EditorShell({ document, currentUserId, currentUserName }: Props)
         </div>
       </header>
 
-      {/* Editor */}
       <TiptapEditor
         content={content}
         editable={canEdit}
-        onChange={handleContentChange}
+        onChange={handleChange}
       />
 
-      {/* Collaborator slide-over */}
       {showCollaborators && (
         <CollaboratorPanel
           documentId={document.id}

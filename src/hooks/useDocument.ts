@@ -18,9 +18,8 @@ export function useDocument(serverDoc: ServerDoc) {
   const [content, setContent] = useState(serverDoc.content);
   const [syncStatus, setSyncStatus] = useState<SyncStatus>("synced");
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const latestContent = useRef(content);
+  const clockRef = useRef(serverDoc.serverClock);
 
-  // Seed IDB on first load — server wins if its clock is newer
   useEffect(() => {
     async function init() {
       const db = getDB();
@@ -36,11 +35,10 @@ export function useDocument(serverDoc: ServerDoc) {
           syncStatus: "synced",
         });
         setContent(serverDoc.content);
-        latestContent.current = serverDoc.content;
+        clockRef.current = serverDoc.serverClock;
       } else {
-        // Local has unsaved work — use it
         setContent(local.content);
-        latestContent.current = local.content;
+        clockRef.current = local.serverClock;
         if (local.syncStatus === "pending") setSyncStatus("pending");
       }
     }
@@ -48,30 +46,45 @@ export function useDocument(serverDoc: ServerDoc) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [serverDoc.id]);
 
-  // Debounced autosave to IDB
   const handleContentChange = useCallback((html: string) => {
     setContent(html);
-    latestContent.current = html;
     setSyncStatus("pending");
 
     if (saveTimer.current) clearTimeout(saveTimer.current);
     saveTimer.current = setTimeout(async () => {
       const db = getDB();
       const local = await db.documents.get(serverDoc.id);
+      const clock = local?.serverClock ?? clockRef.current;
+
       await db.documents.put({
         id: serverDoc.id,
         title: serverDoc.title,
         content: html,
-        serverClock: local?.serverClock ?? serverDoc.serverClock,
+        serverClock: clock,
         updatedAt: Date.now(),
         syncStatus: "pending",
       });
-    }, 800);
-  }, [serverDoc.id, serverDoc.title, serverDoc.serverClock]);
 
-  // Track online status
+      await db.pendingOps.add({
+        docId: serverDoc.id,
+        content: html,
+        baseClock: clock,
+        timestamp: Date.now(),
+        attempts: 0,
+      });
+    }, 800);
+  }, [serverDoc.id, serverDoc.title]);
+
+  const applyServerUpdate = useCallback((newContent: string, newClock: number) => {
+    setContent(newContent);
+    clockRef.current = newClock;
+    setSyncStatus("synced");
+  }, []);
+
   useEffect(() => {
-    function onOffline() { setSyncStatus("offline"); }
+    function onOffline() {
+      setSyncStatus("offline");
+    }
     function onOnline() {
       setSyncStatus((prev) => (prev === "offline" ? "pending" : prev));
     }
@@ -84,5 +97,5 @@ export function useDocument(serverDoc: ServerDoc) {
     };
   }, []);
 
-  return { content, syncStatus, setSyncStatus, handleContentChange };
+  return { content, syncStatus, setSyncStatus, handleContentChange, applyServerUpdate };
 }

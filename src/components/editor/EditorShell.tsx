@@ -3,11 +3,13 @@
 import { useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Users } from "lucide-react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { TiptapEditor } from "@/components/editor/TiptapEditor";
 import { CollaboratorPanel } from "@/components/editor/CollaboratorPanel";
 import { SyncStatusBadge } from "@/components/editor/SyncStatusBadge";
 import { useDocument } from "@/hooks/useDocument";
+import { useSync } from "@/hooks/useSync";
 import type { UserRole } from "@/types";
 
 interface Props {
@@ -30,12 +32,34 @@ export function EditorShell({ document, currentUserId, currentUserName }: Props)
 
   const canEdit = document.role === "OWNER" || document.role === "EDITOR";
 
-  const { content, syncStatus, handleContentChange } = useDocument({
+  const {
+    content,
+    syncStatus,
+    setSyncStatus,
+    handleContentChange,
+    applyServerUpdate,
+  } = useDocument({
     id: document.id,
     title: document.title,
     content: document.content,
     serverClock: document.serverClock,
     role: document.role,
+  });
+
+  useSync({
+    docId: document.id,
+    setSyncStatus,
+    onSynced(newContent, newClock) {
+      applyServerUpdate(newContent, newClock);
+    },
+    onConflict(mergedContent, newClock) {
+      applyServerUpdate(mergedContent, newClock);
+      toast.warning("Conflict resolved", {
+        description:
+          "Your offline changes overlapped with edits from another user. The document has been auto-merged — server changes were kept where both sides edited the same section.",
+        duration: 6000,
+      });
+    },
   });
 
   async function saveTitle(newTitle: string) {
@@ -74,9 +98,7 @@ export function EditorShell({ document, currentUserId, currentUserName }: Props)
               aria-label="Document title"
             />
           ) : (
-            <h1 className="text-lg font-semibold text-gray-900 truncate">
-              {title}
-            </h1>
+            <h1 className="text-lg font-semibold text-gray-900 truncate">{title}</h1>
           )}
         </div>
 

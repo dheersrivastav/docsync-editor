@@ -55,7 +55,7 @@ export function AIToolbar({ content, onApply, onTitleChange }: Props) {
   }
 
   return (
-    <div className="border-b border-[#E5E7EB] bg-white">
+    <div className="border-b border-[#E5E7EB] bg-[#F9FAFB]">
       <div className="flex items-center gap-0.5 px-4 py-1.5">
         <Sparkles className="h-3 w-3 text-[#6D28D9] mr-2 shrink-0" />
         {actions.map(({ id, label }) => (

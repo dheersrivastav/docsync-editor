@@ -11,13 +11,13 @@ interface Props {
 }
 
 function ToolBtn({
-  onClick,
+  onMouseDown,
   active,
   disabled,
   label,
   children,
 }: {
-  onClick: () => void;
+  onMouseDown: (e: React.MouseEvent) => void;
   active?: boolean;
   disabled?: boolean;
   label: string;
@@ -25,15 +25,16 @@ function ToolBtn({
 }) {
   return (
     <button
-      onClick={onClick}
+      type="button"
+      onMouseDown={onMouseDown}
       disabled={disabled}
       title={label}
       aria-label={label}
       aria-pressed={active}
-      className={`p-1.5 rounded-md transition-colors duration-100 ${
+      className={`p-2 rounded-md transition-colors duration-100 ${
         active
           ? "bg-[#6D28D9] text-white"
-          : "text-[#6B7280] hover:bg-[#F3F4F6] hover:text-[#111827]"
+          : "text-[#6B7280] hover:bg-white hover:text-[#111827] hover:shadow-sm"
       } disabled:opacity-30 disabled:cursor-not-allowed`}
     >
       {children}
@@ -42,22 +43,29 @@ function ToolBtn({
 }
 
 function Divider() {
-  return <span className="w-px h-4 bg-[#E5E7EB] mx-1" aria-hidden="true" />;
+  return <span className="w-px h-4 bg-[#E5E7EB] mx-1 shrink-0" aria-hidden="true" />;
 }
 
 export function Toolbar({ editor }: Props) {
+  function cmd(fn: () => void) {
+    return (e: React.MouseEvent) => {
+      e.preventDefault(); // keeps editor focused
+      fn();
+    };
+  }
+
   return (
-    <div className="flex items-center gap-0.5 px-4 py-2 border-b border-[#E5E7EB] flex-wrap bg-white">
+    <div className="flex items-center gap-0.5 px-4 py-2 border-b border-[#E5E7EB] flex-wrap bg-[#F9FAFB]">
       <ToolBtn
         label="Heading 2"
-        onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+        onMouseDown={cmd(() => editor.chain().focus().toggleHeading({ level: 2 }).run())}
         active={editor.isActive("heading", { level: 2 })}
       >
         <Heading2 className="h-4 w-4" />
       </ToolBtn>
       <ToolBtn
         label="Heading 3"
-        onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+        onMouseDown={cmd(() => editor.chain().focus().toggleHeading({ level: 3 }).run())}
         active={editor.isActive("heading", { level: 3 })}
       >
         <Heading3 className="h-4 w-4" />
@@ -67,21 +75,21 @@ export function Toolbar({ editor }: Props) {
 
       <ToolBtn
         label="Bold"
-        onClick={() => editor.chain().focus().toggleBold().run()}
+        onMouseDown={cmd(() => editor.chain().focus().toggleBold().run())}
         active={editor.isActive("bold")}
       >
         <Bold className="h-4 w-4" />
       </ToolBtn>
       <ToolBtn
         label="Italic"
-        onClick={() => editor.chain().focus().toggleItalic().run()}
+        onMouseDown={cmd(() => editor.chain().focus().toggleItalic().run())}
         active={editor.isActive("italic")}
       >
         <Italic className="h-4 w-4" />
       </ToolBtn>
       <ToolBtn
         label="Strikethrough"
-        onClick={() => editor.chain().focus().toggleStrike().run()}
+        onMouseDown={cmd(() => editor.chain().focus().toggleStrike().run())}
         active={editor.isActive("strike")}
       >
         <Strikethrough className="h-4 w-4" />
@@ -91,28 +99,28 @@ export function Toolbar({ editor }: Props) {
 
       <ToolBtn
         label="Bullet list"
-        onClick={() => editor.chain().focus().toggleBulletList().run()}
+        onMouseDown={cmd(() => editor.chain().focus().toggleBulletList().run())}
         active={editor.isActive("bulletList")}
       >
         <List className="h-4 w-4" />
       </ToolBtn>
       <ToolBtn
         label="Numbered list"
-        onClick={() => editor.chain().focus().toggleOrderedList().run()}
+        onMouseDown={cmd(() => editor.chain().focus().toggleOrderedList().run())}
         active={editor.isActive("orderedList")}
       >
         <ListOrdered className="h-4 w-4" />
       </ToolBtn>
       <ToolBtn
         label="Blockquote"
-        onClick={() => editor.chain().focus().toggleBlockquote().run()}
+        onMouseDown={cmd(() => editor.chain().focus().toggleBlockquote().run())}
         active={editor.isActive("blockquote")}
       >
         <Quote className="h-4 w-4" />
       </ToolBtn>
       <ToolBtn
         label="Horizontal rule"
-        onClick={() => editor.chain().focus().setHorizontalRule().run()}
+        onMouseDown={cmd(() => editor.chain().focus().setHorizontalRule().run())}
       >
         <Minus className="h-4 w-4" />
       </ToolBtn>
@@ -121,14 +129,14 @@ export function Toolbar({ editor }: Props) {
 
       <ToolBtn
         label="Undo"
-        onClick={() => editor.chain().focus().undo().run()}
+        onMouseDown={cmd(() => editor.chain().focus().undo().run())}
         disabled={!editor.can().undo()}
       >
         <Undo className="h-4 w-4" />
       </ToolBtn>
       <ToolBtn
         label="Redo"
-        onClick={() => editor.chain().focus().redo().run()}
+        onMouseDown={cmd(() => editor.chain().focus().redo().run())}
         disabled={!editor.can().redo()}
       >
         <Redo className="h-4 w-4" />

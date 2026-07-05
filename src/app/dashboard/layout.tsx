@@ -60,7 +60,7 @@ export default async function DashboardLayout({
       <footer className="border-t border-gray-200 mt-16 py-6 text-center text-sm text-gray-500">
         Built by{" "}
         <a
-          href="https://github.com/"
+          href="https://github.com/dheersrivastav"
           target="_blank"
           rel="noopener noreferrer"
           className="text-blue-600 hover:underline"
@@ -69,13 +69,14 @@ export default async function DashboardLayout({
         </a>{" "}
         ·{" "}
         <a
-          href="https://linkedin.com/in/"
+          href="https://linkedin.com/in/dheer-srivastav"
           target="_blank"
           rel="noopener noreferrer"
           className="text-blue-600 hover:underline"
         >
           LinkedIn
-        </a>
+        </a>{" "}
+        · DocSync
       </footer>
     </div>
   );

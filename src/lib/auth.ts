@@ -3,6 +3,7 @@ import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
+import { rateLimit } from "@/lib/rateLimit";
 
 const loginSchema = z.object({
   email: z.string().email(),
@@ -16,7 +17,12 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   providers: [
     Credentials({
-      async authorize(credentials) {
+      async authorize(credentials, req) {
+        const ip =
+          (req as unknown as { headers?: Record<string, string> }).headers?.["x-forwarded-for"] ?? "unknown";
+
+        if (!rateLimit(`login:${ip}`, 10, 60_000)) return null;
+
         const parsed = loginSchema.safeParse(credentials);
         if (!parsed.success) return null;
 

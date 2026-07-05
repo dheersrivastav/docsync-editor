@@ -70,21 +70,25 @@ export function EditorShell({ document, currentUserId, currentUserName }: Props)
     onRemoteUpdate: applyServerUpdate,
   });
 
+  const onSynced = useCallback((newContent: string, newClock: number) => {
+    applyServerUpdate(newContent, newClock);
+    broadcastUpdate(newContent, newClock);
+  }, [applyServerUpdate, broadcastUpdate]);
+
+  const onConflict = useCallback((mergedContent: string, newClock: number) => {
+    applyServerUpdate(mergedContent, newClock);
+    broadcastUpdate(mergedContent, newClock);
+    toast.warning("Conflict resolved", {
+      description: "Your offline changes were auto-merged with server edits.",
+      duration: 5000,
+    });
+  }, [applyServerUpdate, broadcastUpdate]);
+
   useSync({
     docId: document.id,
     setSyncStatus,
-    onSynced(newContent, newClock) {
-      applyServerUpdate(newContent, newClock);
-      broadcastUpdate(newContent, newClock);
-    },
-    onConflict(mergedContent, newClock) {
-      applyServerUpdate(mergedContent, newClock);
-      broadcastUpdate(mergedContent, newClock);
-      toast.warning("Conflict resolved", {
-        description: "Your offline changes were auto-merged with server edits.",
-        duration: 5000,
-      });
-    },
+    onSynced,
+    onConflict,
   });
 
   const handleChange = useCallback((html: string) => {

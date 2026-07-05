@@ -75,6 +75,7 @@ export function useSync({ docId, onSynced, onConflict, setSyncStatus }: UseSyncO
     }
 
     if (attempt >= MAX_ATTEMPTS) {
+      await db.pendingOps.bulkDelete(allIds);
       await db.documents.update(docId, { syncStatus: "conflict" });
       setSyncStatus("conflict");
     }

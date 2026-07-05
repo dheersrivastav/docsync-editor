@@ -30,6 +30,8 @@ model Document {
   owner         User                   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
   collaborators DocumentCollaborator[]
   versions      DocumentVersion[]
+
+  @@index([ownerId])
 }
 
 model DocumentCollaborator {
@@ -43,6 +45,7 @@ model DocumentCollaborator {
   user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([documentId, userId])
+  @@index([userId])
 }
 
 model DocumentVersion {
@@ -56,6 +59,8 @@ model DocumentVersion {
 
   document  Document @relation(fields: [documentId], references: [id], onDelete: Cascade)
   createdBy User     @relation(fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([documentId, serverClock])
 }
 
 enum Role {

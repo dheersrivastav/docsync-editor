@@ -4,10 +4,13 @@ import { useState } from "react";
 import Link from "next/link";
 import { ArrowLeft, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { TiptapEditor } from "@/components/editor/TiptapEditor";
 import { CollaboratorPanel } from "@/components/editor/CollaboratorPanel";
+import { SyncStatusBadge } from "@/components/editor/SyncStatusBadge";
+import { useDocument } from "@/hooks/useDocument";
 import type { UserRole } from "@/types";
 
-interface EditorShellProps {
+interface Props {
   document: {
     id: string;
     title: string;
@@ -21,29 +24,39 @@ interface EditorShellProps {
   currentUserName: string;
 }
 
-export function EditorShell({ document, currentUserId, currentUserName }: EditorShellProps) {
+export function EditorShell({ document, currentUserId, currentUserName }: Props) {
   const [title, setTitle] = useState(document.title);
   const [showCollaborators, setShowCollaborators] = useState(false);
 
+  const canEdit = document.role === "OWNER" || document.role === "EDITOR";
+
+  const { content, syncStatus, handleContentChange } = useDocument({
+    id: document.id,
+    title: document.title,
+    content: document.content,
+    serverClock: document.serverClock,
+    role: document.role,
+  });
+
   async function saveTitle(newTitle: string) {
-    if (!newTitle.trim() || newTitle === document.title) return;
+    const trimmed = newTitle.trim();
+    if (!trimmed || trimmed === document.title) return;
     await fetch(`/api/documents/${document.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title: newTitle }),
+      body: JSON.stringify({ title: trimmed }),
     });
   }
 
-  const canEdit = document.role === "OWNER" || document.role === "EDITOR";
-
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="h-screen flex flex-col bg-white">
       {/* Top bar */}
-      <header className="border-b border-gray-200 px-4 h-14 flex items-center justify-between sticky top-0 bg-white z-10">
+      <header className="border-b border-gray-200 px-4 h-14 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-3 min-w-0 flex-1">
           <Link
             href="/dashboard"
             className="text-gray-500 hover:text-gray-900 transition-colors shrink-0"
+            aria-label="Back to dashboard"
           >
             <ArrowLeft className="h-5 w-5" />
           </Link>
@@ -57,22 +70,23 @@ export function EditorShell({ document, currentUserId, currentUserName }: Editor
               onKeyDown={(e) => {
                 if (e.key === "Enter") e.currentTarget.blur();
               }}
-              className="text-lg font-semibold text-gray-900 bg-transparent border-none outline-none truncate w-full max-w-md"
+              className="text-lg font-semibold text-gray-900 bg-transparent border-none outline-none truncate w-full max-w-sm"
               aria-label="Document title"
             />
           ) : (
-            <h1 className="text-lg font-semibold text-gray-900 truncate">{title}</h1>
+            <h1 className="text-lg font-semibold text-gray-900 truncate">
+              {title}
+            </h1>
           )}
         </div>
 
-        <div className="flex items-center gap-2 ml-4 shrink-0">
-          <span className="text-xs text-gray-400 hidden sm:block">
-            {document.role}
-          </span>
+        <div className="flex items-center gap-3 ml-4 shrink-0">
+          <SyncStatusBadge status={syncStatus} />
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setShowCollaborators(true)}
+            aria-label="Share document"
           >
             <Users className="h-4 w-4 mr-1.5" />
             Share
@@ -80,11 +94,14 @@ export function EditorShell({ document, currentUserId, currentUserName }: Editor
         </div>
       </header>
 
-      {/* Editor area — placeholder until Phase 3 */}
-      <div className="flex-1 flex items-center justify-center text-gray-400">
-        <p className="text-sm">Editor loads in Phase 3</p>
-      </div>
+      {/* Editor */}
+      <TiptapEditor
+        content={content}
+        editable={canEdit}
+        onChange={handleContentChange}
+      />
 
+      {/* Collaborator slide-over */}
       {showCollaborators && (
         <CollaboratorPanel
           documentId={document.id}

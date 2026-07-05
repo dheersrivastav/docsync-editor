@@ -2,13 +2,15 @@
 
 import { useState, useCallback } from "react";
 import Link from "next/link";
-import { ArrowLeft, Users } from "lucide-react";
+import { ArrowLeft, Users, History } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { TiptapEditor } from "@/components/editor/TiptapEditor";
 import { CollaboratorPanel } from "@/components/editor/CollaboratorPanel";
 import { SyncStatusBadge } from "@/components/editor/SyncStatusBadge";
 import { PresenceAvatars } from "@/components/editor/PresenceAvatars";
+import { VersionPanel } from "@/components/editor/VersionPanel";
+import { AIToolbar } from "@/components/editor/AIToolbar";
 import { useDocument } from "@/hooks/useDocument";
 import { useSync } from "@/hooks/useSync";
 import { useCollaboration } from "@/hooks/useCollaboration";
@@ -28,9 +30,11 @@ interface Props {
   currentUserName: string;
 }
 
+type Panel = "collaborators" | "versions" | null;
+
 export function EditorShell({ document, currentUserId, currentUserName }: Props) {
   const [title, setTitle] = useState(document.title);
-  const [showCollaborators, setShowCollaborators] = useState(false);
+  const [panel, setPanel] = useState<Panel>(null);
 
   const canEdit = document.role === "OWNER" || document.role === "EDITOR";
 
@@ -54,7 +58,7 @@ export function EditorShell({ document, currentUserId, currentUserName }: Props)
     onRemoteUpdate: applyServerUpdate,
   });
 
-  const { flush } = useSync({
+  useSync({
     docId: document.id,
     setSyncStatus,
     onSynced(newContent, newClock) {
@@ -65,7 +69,7 @@ export function EditorShell({ document, currentUserId, currentUserName }: Props)
       applyServerUpdate(mergedContent, newClock);
       broadcastUpdate(mergedContent, newClock);
       toast.warning("Conflict resolved", {
-        description: "Your offline changes overlapped with another user's edits. The document was auto-merged — server edits were kept where both sides changed the same section.",
+        description: "Your offline changes overlapped with another user's edits. The document was auto-merged.",
         duration: 6000,
       });
     },
@@ -78,12 +82,17 @@ export function EditorShell({ document, currentUserId, currentUserName }: Props)
 
   async function saveTitle(newTitle: string) {
     const trimmed = newTitle.trim();
-    if (!trimmed || trimmed === document.title) return;
+    if (!trimmed || trimmed === title) return;
     await fetch(`/api/documents/${document.id}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ title: trimmed }),
     });
+  }
+
+  function handleRestored(newContent: string, newClock: number) {
+    applyServerUpdate(newContent, newClock);
+    broadcastUpdate(newContent, newClock);
   }
 
   return (
@@ -113,20 +122,40 @@ export function EditorShell({ document, currentUserId, currentUserName }: Props)
           )}
         </div>
 
-        <div className="flex items-center gap-3 ml-4 shrink-0">
+        <div className="flex items-center gap-2 ml-4 shrink-0">
           <PresenceAvatars users={onlineUsers} typingUser={typingUser} />
           <SyncStatusBadge status={syncStatus} />
           <Button
             variant="ghost"
             size="sm"
-            onClick={() => setShowCollaborators(true)}
+            onClick={() => setPanel(panel === "versions" ? null : "versions")}
+            aria-label="Version history"
+          >
+            <History className="h-4 w-4 mr-1.5" />
+            <span className="hidden sm:inline">History</span>
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setPanel(panel === "collaborators" ? null : "collaborators")}
             aria-label="Share document"
           >
             <Users className="h-4 w-4 mr-1.5" />
-            Share
+            <span className="hidden sm:inline">Share</span>
           </Button>
         </div>
       </header>
+
+      {canEdit && (
+        <AIToolbar
+          content={content}
+          onApply={handleChange}
+          onTitleChange={(t) => {
+            setTitle(t);
+            saveTitle(t);
+          }}
+        />
+      )}
 
       <TiptapEditor
         content={content}
@@ -134,11 +163,19 @@ export function EditorShell({ document, currentUserId, currentUserName }: Props)
         onChange={handleChange}
       />
 
-      {showCollaborators && (
+      {panel === "collaborators" && (
         <CollaboratorPanel
           documentId={document.id}
           isOwner={document.role === "OWNER"}
-          onClose={() => setShowCollaborators(false)}
+          onClose={() => setPanel(null)}
+        />
+      )}
+
+      {panel === "versions" && (
+        <VersionPanel
+          documentId={document.id}
+          onClose={() => setPanel(null)}
+          onRestored={handleRestored}
         />
       )}
     </div>

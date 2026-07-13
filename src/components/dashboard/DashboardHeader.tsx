@@ -59,8 +59,12 @@ export function DashboardHeader({ name, email }: Props) {
               <p className="text-xs text-gray-500 truncate mt-0.5">{email}</p>
             </div>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="rounded-lg mx-1 cursor-pointer" onSelect={handleSignOut}>
-              <div className="flex items-center gap-2 text-sm text-gray-700">
+            <DropdownMenuItem className="rounded-lg mx-1 cursor-pointer p-0">
+              <button
+                onClick={handleSignOut}
+                disabled={loggingOut}
+                className="flex items-center gap-2 w-full text-left text-sm text-gray-700 px-2 py-1.5 disabled:opacity-60"
+              >
                 {loggingOut ? (
                   <svg className="h-3.5 w-3.5 animate-spin text-gray-400" viewBox="0 0 24 24" fill="none">
                     <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" className="opacity-25"/>
@@ -70,7 +74,7 @@ export function DashboardHeader({ name, email }: Props) {
                   <LogOut className="h-3.5 w-3.5 text-gray-400" />
                 )}
                 {loggingOut ? "Signing out..." : "Sign out"}
-              </div>
+              </button>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

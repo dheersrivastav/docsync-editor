@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "@/components/ui/sonner";
+import { Providers } from "@/components/Providers";
 
 const geist = Geist({ subsets: ["latin"] });
 
@@ -10,15 +11,13 @@ export const metadata: Metadata = {
   description: "A local-first collaborative document editor",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body className={geist.className}>
-        {children}
+        <Providers>
+          {children}
+        </Providers>
         <Toaster position="bottom-right" />
       </body>
     </html>

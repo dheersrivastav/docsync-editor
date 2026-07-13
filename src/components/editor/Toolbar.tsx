@@ -33,7 +33,7 @@ function ToolBtn({
       aria-pressed={active}
       className={`p-2 rounded-lg transition-colors duration-100 ${
         active
-          ? "bg-violet-600 text-white shadow-sm"
+          ? "bg-gray-900 text-white shadow-sm"
           : "text-gray-500 hover:bg-gray-100 hover:text-gray-900"
       } disabled:opacity-30 disabled:cursor-not-allowed`}
     >

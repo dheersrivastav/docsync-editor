@@ -12,7 +12,7 @@ const config: Record<SyncStatus, { icon: React.ReactNode; label: string; classNa
   pending: {
     icon: <Loader2 className="h-3.5 w-3.5 animate-spin" />,
     label: "Saving",
-    className: "text-violet-600 bg-violet-50 border-violet-200",
+    className: "text-gray-900 bg-gray-100 border-gray-200",
   },
   offline: {
     icon: <CloudOff className="h-3.5 w-3.5" />,

@@ -44,7 +44,7 @@ function HeaderButton({
     <button
       onClick={onClick}
       aria-label={label}
-      className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 border border-gray-200 rounded-lg hover:border-violet-300 hover:text-violet-700 hover:bg-violet-50 transition-colors duration-150 bg-white"
+      className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 hover:border-gray-400 transition-colors duration-150 bg-white"
     >
       {children}
     </button>

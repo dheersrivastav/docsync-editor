@@ -40,7 +40,7 @@ async function getDocuments(userId: string) {
 }
 
 const roleBadge: Record<string, string> = {
-  OWNER:  "text-violet-600 bg-violet-50 border border-violet-200",
+  OWNER:  "text-gray-900 bg-gray-100 border border-gray-200",
   EDITOR: "text-emerald-600 bg-emerald-50 border border-emerald-200",
   VIEWER: "text-gray-500 bg-gray-50 border border-gray-200",
 };
@@ -65,7 +65,7 @@ export default async function DashboardPage() {
 
       {docs.length === 0 ? (
         <div className="border-2 border-dashed border-gray-200 rounded-2xl flex flex-col items-center justify-center py-24 text-center bg-white">
-          <div className="w-12 h-12 rounded-2xl bg-violet-50 flex items-center justify-center mb-4">
+          <div className="w-12 h-12 rounded-2xl bg-gray-100 flex items-center justify-center mb-4">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="#7C3AED" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
               <polyline points="14 2 14 8 20 8" stroke="#7C3AED" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
@@ -86,7 +86,7 @@ export default async function DashboardPage() {
             >
               <svg
                 width="18" height="18" viewBox="0 0 24 24" fill="none"
-                className="shrink-0 text-gray-300 group-hover:text-violet-400 transition-colors duration-150"
+                className="shrink-0 text-gray-300 group-hover:text-gray-700 transition-colors duration-150"
               >
                 <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
                 <polyline points="14 2 14 8 20 8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
@@ -95,7 +95,7 @@ export default async function DashboardPage() {
               </svg>
 
               <Link href={`/editor/${doc.id}`} className="flex-1 min-w-0">
-                <p className="text-[15px] font-medium text-gray-900 truncate group-hover:text-violet-700 transition-colors duration-150">
+                <p className="text-[15px] font-medium text-gray-900 truncate group-hover:text-gray-700 transition-colors duration-150">
                   {doc.title}
                 </p>
                 <p className="text-sm text-gray-400 mt-0.5">
